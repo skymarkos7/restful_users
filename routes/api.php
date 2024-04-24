@@ -8,6 +8,13 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/user/getall', [UserController::class,'getAllUsers']);
 
-// Route::get('/user', [UserController::class, 'getUsers']);
+Route::get('/user/getuser/{id}', [UserController::class,'getUser']);
+
+Route::post('/user/insert', [UserController::class, 'insertUsers']);
+
+Route::put('/user/update', [UserController::class,'getUser']);
+
+Route::delete('/user/delete', [UserController::class,'getUser']);
 
