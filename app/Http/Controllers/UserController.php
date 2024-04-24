@@ -19,65 +19,86 @@ class UserController extends Controller
      */
 
 
-     // GET
+    // GET
     public function getAllUsers()
     {
         try {
             $users = User::all();
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Ocorreu um erro ao realizar a consulta.',
-                'info' => $e->getMessage()
+                'info' => $e->getMessage(),
+                'code' => 500
             ], 500);
         };
 
         if (count($users) == 0) {
             return response()->json([
-                'message' => 'Ainda não há usuários cadastrados.'
+                'message' => 'Ainda não há usuários cadastrados.',
+                'code' => 404
             ], 404);
         }
 
-        return $users;
+        return response()->json([
+            'data' => $users,
+            'code' => 200
+        ], 200);
     }
 
     // GET
-    public function getUser($id)
+    public function getUser($id = null)
     {
+        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário'], 400);
+
         try {
-        $users = User::find($id);
+            $users = User::find($id);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Ocorreu um erro ao realizar a consulta.',
-                'info' => $e->getMessage()
+                'info' => $e->getMessage(),
+                'code' => 500
             ], 500);
         };
 
         if ($users == null) {
             return response()->json([
-                'message' => 'O usuário buscado não existe'
+                'message' => 'O usuário buscado não existe',
+                'code' => 404
             ], 404);
         }
 
-        return $users;
+        return response()->json([
+            'data' => $users,
+            'code' => 200
+        ], 200);
     }
 
     // POST
     public function insertUsers(Request $request)
     {
         try {
+            $userExist = User::where('email', $request->email)
+                ->exists();
+
+            if ($userExist) return response()->json(['message' => 'Já existe um usuário cadastrado com o mesmo email', 'erro' => 406], 406);
+
             $users = User::create([
-                'name' => 'manoela',
-                'email' => 'manoela@gomes.com',
-                'password'=> bcrypt('caiuNaRedea'),
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
             ]);
 
-            return $users;
+            return response()->json([
+                'message'=> 'O usuário foi inserido com sucesso!',
+                'data' => $users
+            ], 201);
 
         } catch (\Exception $e) {
-            return back()->with("Ocorreu um erro na inserção, tente inserir um usuário diferente", $e->getMessage());
+            return response()->json([
+                'message' => 'Ocorreu um erro ao realizar a inserção',
+                'info' => $e->getMessage()
+            ], 500);
         }
-
     }
 
     // PUT

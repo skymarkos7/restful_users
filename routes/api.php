@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/user/getall', [UserController::class,'getAllUsers']);
 
-Route::get('/user/getuser/{id}', [UserController::class,'getUser']);
+Route::get('/user/get/{id?}', [UserController::class,'getUser']);
 
 Route::post('/user/insert', [UserController::class, 'insertUsers']);
 
