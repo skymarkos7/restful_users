@@ -35,7 +35,8 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
         - Se existe lista o usuário com o código de Sucesso (200).
         - Se não existe o registro informa que o usuário não existe no banco, código (204).
     - Verifica se foi informado algum ID
-        - Caso não tenha informado, é pedido que faça uma nova solicitação passando um ID, Erro na requisição (400) 
+        - Caso não tenha informado, é pedido que faça uma nova solicitação passando um ID, Erro na requisição (400)
+    - Forçado o uso de número inteiro para o ID, code (400).  
 
 - <b>POST: api/user/insert</b>    
     - Verica se a comunicação com o banco de dados ocorreu como esperado.
@@ -44,6 +45,7 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
     - Verifica se já possui um usuario com o mesmo email
         - Caso já exista é retornado essa informação e o código (406)
     - Caso tente inserir um novo usuário sem todos os campos obrigatórios ["nome, email, password"], receberá uma mensagem informando e o código (400).
+    - Inserido validações para o formato dos campos de name, email e password, caso o formato não seja igual ao esperado retornará uma mensagem informando e o código referente a semantica incorreta (422)
 
 - <b>PUT: api/user/update/{id}</b>    
     - Verica se a comunicação com o banco de dados ocorreu como esperado.
@@ -54,14 +56,16 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
         - Caso não tenha informado, é pedido que faça uma nova solicitação passando um ID, Erro na requisição (400)
     - Caso tente atualizar um usuário usando um email já cadastrado para outro usuário, receberá uma mensagem de erro e um detralhamento de INFO sobre o erro.
     - Verifica se existe um usuário não deletado com o id informado, caso não haja é retornado uma mensage com o código de erro (406)
+    - Forçado o uso de número inteiro para o ID, code (400).
 
 - <b>DELETE: api/user/delete/{id}</b>
     - Verica se a comunicação com o banco de dados ocorreu como esperado.
         - Se bem sussedida continua e retorna os dados inseridos e o código de sucesso (201).
-        - Caso contrário retorna uma msg e o código (500)
-    - Verifica se foi informado algum ID
-        - Caso não tenha informado, é pedido que faça uma nova solicitação passando um ID, Erro na requisição (400)
-    - Verifica se existe um usuário não deletado com o id informado, caso não haja é retornado uma mensage com o código de erro (406)        
+        - Caso contrário retorna uma msg e o código (500).
+    - Verifica se foi informado algum ID.
+        - Caso não tenha informado, é pedido que faça uma nova solicitação passando um ID, Erro na requisição (400).
+    - Verifica se existe um usuário não deletado com o id informado, caso não haja é retornado uma mensage com o código de erro (406).
+    - Forçado o uso de número inteiro para o ID, code (400).
 
 ## License
 
