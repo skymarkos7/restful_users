@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -48,15 +49,24 @@ class UserController extends Controller
     // GET
     public function getUser($id = null)
     {
-        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário', 'code' => 400], 400);
+        if (!is_numeric($id)) return response()->json(['message' => 'O ID deve ser um número inteiro', 'code' => 400], 400);
 
-        $userExist = User::where('id', $id)
-                ->exists();
-
-        if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
+        if(is_null($id)) return response()->json(['message' => 'Você esqueceu de informar o ID do usuário', 'code' => 400], 400);
 
         try {
+            $userExist = User::where('id', $id)
+                ->exists();
+
+            if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
+
             $users = User::find($id);
+
+            if ($users == null) {
+                return response()->json([
+                    'message' => 'O usuário buscado não existe',
+                    'code' => 204
+                ], 204);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Ocorreu um erro ao realizar a consulta.',
@@ -64,13 +74,6 @@ class UserController extends Controller
                 'code' => 500
             ], 500);
         };
-
-        if ($users == null) {
-            return response()->json([
-                'message' => 'O usuário buscado não existe',
-                'code' => 204
-            ], 204);
-        }
 
         return response()->json([
             'data' => $users,
@@ -81,11 +84,22 @@ class UserController extends Controller
     // POST
     public function insertUsers(Request $request)
     {
-        try {
-            if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
-                return response()->json(['message' => 'os campos: nome, email e password são obrigatórios', 'code' => 400], 400);
-            }
+        if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
+            return response()->json(['message' => 'os campos: name, email e password são obrigatórios', 'code' => 400], 400);
+        }
 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        // Se a validação falhar, retorne os erros
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'code' => 422], 422);
+        }
+
+        try {
             $userExist = User::where('email', $request->email)
                 ->exists();
 
@@ -115,12 +129,25 @@ class UserController extends Controller
     // PUT
     public function updateUser(Request $request, $id = null)
     {
-        try {
-            if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
-                return response()->json(['message' => 'os campos: nome, email e password são obrigatórios', 'code' => 400], 400);
-            }
+        if (!is_numeric($id)) return response()->json(['message' => 'O ID deve ser um número inteiro', 'code' => 400], 400);
 
-            if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário'], 400);
+        if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
+            return response()->json(['message' => 'os campos: name, email e password são obrigatórios', 'code' => 400], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        // Se a validação falhar, retorne os erros
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'code' => 422], 422);
+        }
+
+        try {
+            if(is_null($id)) return response()->json(['message' => 'Você esqueceu de informar o ID do usuário'], 400);
 
             $userExist = User::where('id', $id)
                 ->exists();
@@ -152,19 +179,29 @@ class UserController extends Controller
     // DELETE
     public function deleteUser($id = null)
     {
-        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário', 'code' => 400], 400);
+        if (!is_numeric($id)) return response()->json(['message' => 'O ID deve ser um número inteiro', 'code' => 400], 400);
 
-        $userExist = User::where('id', $id)
-                ->exists();
+        if(is_null($id)) return response()->json(['message' => 'Você esqueceu de informar o ID do usuário', 'code' => 400], 400);
 
-        if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
+        try {
+            $userExist = User::where('id', $id)
+                    ->exists();
 
-        User::where('id', $id)->delete();
+            if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
 
-        return response()->json([
-            'message'=> 'O usuário foi deletado com sucesso!',
-            'data' => User::all(),
-            'code' => 200
-        ], 200);
+            User::where('id', $id)->delete();
+
+            return response()->json([
+                'message'=> 'O usuário foi deletado com sucesso!',
+                'data' => User::all(),
+                'code' => 200
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ocorreu um erro ao tentar deletar o usuário',
+                'info' => $e->getMessage(),
+                'code' => 500
+            ], 500);
+        }
     }
 }
