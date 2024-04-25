@@ -18,11 +18,34 @@
     - Perguntas técnicas.
     - Desafio técnico.
 
+### what are the routes:
+ > O arquivo com a collection para importação fácil no postman está [aqui](resful-users.postman_collection.json) na raiz do projeto, basta realizar a importação.  
+ > Você também pode simplesmente criar e popular as chamadas manualmente aos endpoints. Você encontrará os endpoints no arquivo [api.php](routes\api.php) do projeto.
+- <b>GET</b> /user/getall
+    - não exige nenhum parametro.
+- <b>GET</b> /user/get/{id}
+    - espera requeceber um parâmetro ID de usuário pela url no formato inteiro.
+- <b>POST</b> /user/insert  
+    - espera receber no corpo da requisição no formato form-data os dados:
+        - name : string
+        - email : string em formato de email válido
+        - password : string
+- <b>PUT</b> /user/update/{id}  
+    - espera receber no corpo da requisição no formato json os dados:
+        - name : string
+        - email : string em formato de email válido
+        - password : string
+    - espera receber um ID de usuário na url em formato inteiro.
+- <b>DELETE</b> /user/delete/{id}
+    - espera requeceber um parâmetro ID de usuário pela url no formato inteiro.            
+
+
 ## Methodologies
 - Utilizado softDelete.
     - Assim é possível apagar dados de uma tabela importante com a possibilidade de acessar o dado posteriormente.
     - Ao listar todos os usuários não será listado os usuários com marcação de deletado, o próprio ORM do laravel filtra os dados.
-- Aplicado validações para a entrada de dados do usuário e antecipação de comportamentos inesperados.    
+- Aplicado validações para a entrada de dados do usuário e antecipação de comportamentos inesperados.  
+- Lógica de validação de dados separada em funções menores para reaproveitamento de código.  
 
 ## Validations
 - <b>GET: api/user/getll</b>
