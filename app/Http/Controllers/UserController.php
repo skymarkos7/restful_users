@@ -84,19 +84,15 @@ class UserController extends Controller
     // POST
     public function insertUsers(Request $request)
     {
-        if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
-            return response()->json(['message' => 'os campos: name, email e password são obrigatórios', 'code' => 400], 400);
-        }
+        if ($this->validateEmptyField($request)) return response()->json([
+            'message' => 'os campos: name, email e password são obrigatórios',
+            'code' => 400
+        ], 400);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        // Se a validação falhar, retorne os erros
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'code' => 422], 422);
+        if ($this->validatorFields($request) !== false) {
+            return response()->json([
+                'errors' => $this->validatorFields($request)->errors(),
+                'code' => 422], 422);
         }
 
         try {
@@ -131,19 +127,15 @@ class UserController extends Controller
     {
         if (!is_numeric($id)) return response()->json(['message' => 'O ID deve ser um número inteiro', 'code' => 400], 400);
 
-        if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
-            return response()->json(['message' => 'os campos: name, email e password são obrigatórios', 'code' => 400], 400);
-        }
+        if ($this->validateEmptyField($request)) return response()->json([
+            'message' => 'os campos: name, email e password são obrigatórios',
+            'code' => 400
+        ], 400);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        // Se a validação falhar, retorne os erros
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'code' => 422], 422);
+        if ($this->validatorFields($request) !== false) {
+            return response()->json([
+                'errors' => $this->validatorFields($request)->errors(),
+                'code' => 422], 422);
         }
 
         try {
@@ -203,5 +195,25 @@ class UserController extends Controller
                 'code' => 500
             ], 500);
         }
+    }
+
+    function validateEmptyField($request)
+    {
+        if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function validatorFields($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        return $validator->fails() ? $validator : false;
     }
 }
