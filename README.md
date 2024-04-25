@@ -5,18 +5,24 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## About project
+### For run:
+ - Clone o repositório `git clone https://github.com/skymarkos7/restful_users.git`
+ - Instale as dependências do projeto rodando `composer install` na raiz do projeto
+ - Crie a base de dados inicial para salvar os usuários, com um servidor mysql rodando na máquina rode o comando `php artisan migrate` na raiz do projeto
+ - Finalmente inicie o servidor do projeto `php artisan serve`  
+ > Caso tenha problemas ao rodar o projeto, busque mais detalhes em https://laravel.com/docs/11.x
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-### From run
- - sss
- - sss 
+ ### What was requested:
+ - Arquivo de desafio [aqui](Teste-Técnico.pdf) na raiz do projeto para consulta.
+    - Perguntas técnicas.
+    - Desafio técnico.
 
 ## Methodologies
 - Utilizado softDelete.
     - Assim é possível apagar dados de uma tabela importante com a possibilidade de acessar o dado posteriormente.
     - Ao listar todos os usuários não será listado os usuários com marcação de deletado, o próprio ORM do laravel filtra os dados.
+- Aplicado validações para a entrada de dados do usuário e antecipação de comportamentos inesperados.    
 
 ## Validations
 - <b>GET: api/user/getll</b>
