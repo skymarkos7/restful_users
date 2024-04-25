@@ -45,7 +45,8 @@
     - Assim é possível apagar dados de uma tabela importante com a possibilidade de acessar o dado posteriormente.
     - Ao listar todos os usuários não será listado os usuários com marcação de deletado, o próprio ORM do laravel filtra os dados.
 - Aplicado validações para a entrada de dados do usuário e antecipação de comportamentos inesperados.  
-- Lógica de validação de dados separada em funções menores para reaproveitamento de código.  
+- Lógica de validação de dados separada em funções menores para reaproveitamento de código.
+- Commits realizados em branchs Develop para seguir as boas práticas de uso git. 
 
 ## Validations
 - <b>GET: api/user/getll</b>
