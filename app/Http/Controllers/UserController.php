@@ -35,8 +35,8 @@ class UserController extends Controller
         if (count($users) == 0) {
             return response()->json([
                 'message' => 'Ainda não há usuários cadastrados.',
-                'code' => 404
-            ], 404);
+                'code' => 204
+            ], 204);
         }
 
         return response()->json([
@@ -48,7 +48,12 @@ class UserController extends Controller
     // GET
     public function getUser($id = null)
     {
-        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário'], 400);
+        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário', 'code' => 400], 400);
+
+        $userExist = User::where('id', $id)
+                ->exists();
+
+        if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
 
         try {
             $users = User::find($id);
@@ -63,8 +68,8 @@ class UserController extends Controller
         if ($users == null) {
             return response()->json([
                 'message' => 'O usuário buscado não existe',
-                'code' => 404
-            ], 404);
+                'code' => 204
+            ], 204);
         }
 
         return response()->json([
@@ -77,12 +82,16 @@ class UserController extends Controller
     public function insertUsers(Request $request)
     {
         try {
+            if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
+                return response()->json(['message' => 'os campos: nome, email e password são obrigatórios', 'code' => 400], 400);
+            }
+
             $userExist = User::where('email', $request->email)
                 ->exists();
 
-            if ($userExist) return response()->json(['message' => 'Já existe um usuário cadastrado com o mesmo email', 'erro' => 406], 406);
+            if ($userExist) return response()->json(['message' => 'Já existe um usuário cadastrado com o mesmo email', 'code' => 406], 406);
 
-            $users = User::create([
+            $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
@@ -90,26 +99,72 @@ class UserController extends Controller
 
             return response()->json([
                 'message'=> 'O usuário foi inserido com sucesso!',
-                'data' => $users
+                'data' => $user,
+                'code' => 201
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Ocorreu um erro ao realizar a inserção',
-                'info' => $e->getMessage()
+                'info' => $e->getMessage(),
+                'code' => 500
             ], 500);
         }
     }
 
     // PUT
-    public function updateUser(Request $request)
+    public function updateUser(Request $request, $id = null)
     {
-        $users = User::all();
+        try {
+            if (!isset($request->email) || !isset($request->name) || !isset($request->password)) {
+                return response()->json(['message' => 'os campos: nome, email e password são obrigatórios', 'code' => 400], 400);
+            }
+
+            if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário'], 400);
+
+            $userExist = User::where('id', $id)
+                ->exists();
+
+            if (!$userExist) return response()->json(['message' => 'O ID do usário informado não existe', 'code' => 406], 406);
+
+            User::where('id', $id)
+              ->update([
+                'name' => $request->name,
+                'email'=> $request->email,
+                'password'=> bcrypt($request->password),
+            ]);
+
+            return response()->json([
+                'message'=> 'O usuário foi atualizado com sucesso!',
+                'data' => User::find($id),
+                'code' => 201
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ocorreu um erro ao realizar a atualização',
+                'info' => $e->getMessage(),
+                'code' => 500
+            ], 500);
+        }
     }
 
     // DELETE
-    public function deletetUser(Request $request)
+    public function deleteUser($id = null)
     {
-        $users = User::all();
+        if(is_null($id)) return response()->json(['message' => 'Você enqueceu de informar o ID do usuário', 'code' => 400], 400);
+
+        $userExist = User::where('id', $id)
+                ->exists();
+
+        if (!$userExist) return response()->json(['message' => 'O ID informado não é de um usuário cadastrado', 'code' => 406], 406);
+
+        User::where('id', $id)->delete();
+
+        return response()->json([
+            'message'=> 'O usuário foi deletado com sucesso!',
+            'data' => User::all(),
+            'code' => 200
+        ], 200);
     }
 }
